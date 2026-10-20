@@ -15,4 +15,19 @@ def entrada1():
     contar_extenciones()
 
 def entrada2():
-    pass
+    organizar()
+    print('Archivos organizados')
+
+
+def en_caso_de_duplicados(archivo, carpeta):
+    
+    prit(f"en la carpeta {carpeta.name} hay archivos con el mismo nombre {archivo.name}")
+    entrada = input('''
+    1. verificar si se trata de los mismos, por el peso de los archivos
+    2. sobrescribir
+    ''')
+    match entrada:
+        case '1':
+            pass
+        case '2':
+            sobrescribir(archivo, carpeta)

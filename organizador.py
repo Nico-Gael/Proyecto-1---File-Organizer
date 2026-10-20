@@ -1,61 +1,70 @@
 from pathlib import Path
 
-#  te dice en qué carpeta está parado tu programa de Python en el momento
-#  exacto en que se ejecuta el código
+# ruta base de la carpeta de trabajo
 CARPETA_BASE = Path.cwd()
 
-# me retorna los archivos existentes
-# por lo tanto tambien las rutas de origen
-def verificar_archivos_existentes():
-    archivos_existente = []
-    carpeta_padre = CARPETA_BASE
-    for p in carpeta_padre.rglob("*"):
-        # 1. Si alguna parte de la ruta empieza con '.', lo ignoramos
-        if any(parte.startswith(".") for parte in p.parts):
-            continue
-        if p.is_file() and p.suffix != "" and p.suffix != ".py" and p.suffix != ".pyc":
-            archivos_existente.append(p)
-    return archivos_existente
+# verifica los archivos existentes
+def verifica_archivos_existentes():
+    archivos = []
+    carpeta = CARPETA_BASE
+    for a in carpeta.iterdir():
+        if a.is_file() and a.suffix.lowe() not in ['.pyc', '.pyo', '.py', '']:
+            archivos.append(a)
+    return archivos
 
 
-
-# me retorna los tipos de extenciones existentes
+# devuelve los nombres de las extensiones existentes
 def extenciones_existentes():
-    tipo_de_extenciones = set()
-    archivos_existente = verificar_archivos_existentes()
-    for p in archivos_existente:
-        tipo_de_extenciones.add(p.suffix)
-    tipos_extenciones = [ext.removeprefix(".") for ext in tipo_de_extenciones]
-    return tipos_extenciones
+    archivos = verifica_archivos_existentes()
+    return {a.suffix.lower()[1:] for a in archivos}
 
 
+# crea las carpetas de las extensiones existentes
 def crear_carpeta():
-    extenciones = extenciones_existentes()
-    destino = []
-    for p in extenciones:
-        carpeta = Path(p).resolve()
+    nombres = extenciones_existentes()
+    for c in nombres:
+        carpeta = CARPETA_BASE / c
         carpeta.mkdir(exist_ok=True)
-        destino.append(carpeta)
-    print(f".{destino[0].name}")
-    return destino
 
+# ordena los archivos y carpetas alfabeticamente
+def ordenar_alfabeticamente():
+    archivos = verifica_archivos_existentes()
+    carpetas = extenciones_existentes()
+
+    archivos_ordenados = sorted(archivos, key=lambda a: (a.suffix.lower(), a.name))
+    carpetas_ordenadas = sorted(carpetas)
+
+    return archivos_ordenados, carpetas_ordenadas
+
+
+# muestra el plan de acciones a procesar
+# ame los joins
+def mostrar_plan():
+    archivos_ordenados, carpetas_ordenadas = ordenar_alfabeticamente()
+
+    print(f'''1. Crear carpetas de extensiones existentes:
+
+carpetas a crear:
+{'\n'.join(map(str, carpetas_ordenadas))}
+
+archivos existentes a mover: {len(archivos_ordenados)}
+
+nombres de archivos a mover:
+{'\n'.join(a.name for a in archivos_ordenados)}
+
+resultado:
+{'\n'.join(f'{a.name} -> {a.parent / a.suffix.lower()[1:] / a.name}' for a in archivos_ordenados)}
+''')
 
 def organizar():
-    origen = verificar_archivos_existentes()
-    destino = crear_carpeta()
-    for o in origen:
+    origen = verifica_archivos_existentes()
+    destino = extenciones_existentes()
+    for a in origen:
         for d in destino:
-            if o.suffix == "."+d.name:
-                o.rename(d / o.name)
+            if a.suffix.lower()[1:] == d:
+                a.rename(CARPETA_BASE / d / a.name)
 
 
-
-
-print("Directorio de trabajo:")
-print(Path.cwd())
-
-print("Ubicación de este archivo:")
-print(Path(__file__).resolve())
-
-print("Carpeta que contiene este archivo:")
-print(Path(__file__).resolve().parent)
+mostrar_plan()
+#crear_carpeta()
+#organizar()

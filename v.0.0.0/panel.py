@@ -4,11 +4,9 @@ from entrada_panel import *
 
 print("Hola, bienvenido al organizador de archivos")
 print(
-    """
-    pisicionate en una carpeta y ejecuta 
+    """pisicionate en una carpeta y ejecuta 
     esa carpeta sera la carpeta principal donde se organizaran los archivos
-    en subcarpetas
-    """
+    en subcarpetas"""
 )
 
 entrada = input('''
@@ -23,6 +21,8 @@ entrada = input('''
 
 match entrada:
     case '1':
-        print(entrada1()) 
+        entrada1()
     case '2':
-        print(entrada2())
+        entrada2()
+    case '3':
+        pass
